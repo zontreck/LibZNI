@@ -6,6 +6,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SignAssembly>false</SignAssembly>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configurations>Debug;Release;DebPub;KVPBuild</Configurations>
   </PropertyGroup>
