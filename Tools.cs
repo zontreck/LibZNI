@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -63,6 +64,21 @@ namespace LibZNI
         {
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+        }
+
+        public static string GoUpOneLevel(string path)
+        {
+            string[] paths = path.Split(new[] { '/', '\\' });
+
+            List<string> pathList = paths.ToList();
+            pathList.Remove(pathList[pathList.Count-1]);
+
+            string pathListStr = "";
+            foreach(string s in pathList)
+            {
+                pathListStr += s + "/";
+            }
+            return pathListStr;
         }
     }
 
