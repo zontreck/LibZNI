@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
+[assembly: LibZNI.AutoUpdater("/job/Bot", "!os!.tar")]
 namespace LibZNI
 {
     public class Tools
@@ -12,6 +14,19 @@ namespace LibZNI
         public static Int32 getTimestamp()
         {
             return int.Parse(DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString());
+        }
+
+        public static string GetOSShortID()
+        {
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            bool isMac = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            if (isWindows) return "windows";
+            if (isLinux) return "linux";
+            if (isMac) return "osx";
+
+
+            return "unknown";
         }
 
         public static string Hash2String(byte[] Hash)
