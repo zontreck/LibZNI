@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
-[assembly: LibZNI.AutoUpdater("/job/Bot", "!os!.tar")]
+[assembly: LibZNI.AutoUpdater("/job/LibZNI", "library.tar")]
 namespace LibZNI
 {
     public class Tools
