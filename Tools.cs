@@ -70,6 +70,13 @@ namespace LibZNI
             return ZHash.Instance.Key;
         }
 
+        public static string ZSR(string ToSerialize)
+        {
+            ZHash.Instance.NewSerial();
+            ZHash.Instance.Key = ToSerialize;
+            return ZHash.Instance.Key;
+        }
+
         public static string Base64Encode(string plainText)
         {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
@@ -150,7 +157,7 @@ namespace LibZNI
             for (int i = 0; i < _key.Length; i++)
             {
                 char V = _key[i];
-                if (V != ':')
+                if (V != '-')
                 {
                     MD5 MDHash = MD5.Create();
                     for (int ii = 0; ii < K.Length; ii++)
@@ -178,11 +185,31 @@ namespace LibZNI
             {
 
                 _key = "".PadLeft(10, '0');
-                _key += ":";
+                _key += "-";
                 _key += "".PadRight(4, '0');
-                _key += ":";
+                _key += "-";
                 _key += "".PadRight(6, '0');
-                _key += ":";
+                _key += "-";
+                _key += "".PadRight(8, '0');
+            }
+        }
+
+        public void NewSerial()
+        {
+            lock (_lock)
+            {
+                _key = "".PadLeft(10, '0');
+                _key += "-";
+                _key += "".PadRight(6, '0');
+                _key += "-";
+                _key += "".PadRight(4, '0');
+                _key += "-";
+                _key += "".PadRight(4, '0');
+                _key += "-";
+                _key += "".PadRight(2, '0');
+                _key += "-";
+                _key += "".PadRight(4, '0');
+                _key += "-";
                 _key += "".PadRight(8, '0');
             }
         }
