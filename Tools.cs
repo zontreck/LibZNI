@@ -171,11 +171,11 @@ namespace LibZNI
                         }
                         string Hash = hashData.ToString();
                         tmp[i] = Hash[(i > 31 ? 1 : i)];
-                        Console.Write("\r" + tmp.ToString() + "\r");
+                        //Console.Write("\r" + tmp.ToString() + "\r");
                     }
                 }
             }
-            Console.WriteLine("\r\n");
+            //Console.WriteLine("\r\n");
             _key = tmp.ToString();
         }
 
