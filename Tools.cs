@@ -219,4 +219,64 @@ namespace LibZNI
             _key = Key;
         }
     }
+
+    public static class ZNILSLTools
+    {
+        public static List<string> ParseString2List(this string item, string[] opts, string[] keepopts)
+        {
+            List<string> entries = new List<string>();
+            List<string> tmpBuffer = new List<string>();
+            List<string> buffer = new List<string>();
+            buffer.Add(item);
+            foreach(string x in opts)
+            {
+                for(int i=0;i<buffer.Count;i++)
+                {
+                    string y = buffer[i];
+                    if (y.Contains(x))
+                    {
+                        string[] newbufferItem = y.Split(x);
+                        foreach (string V in newbufferItem)
+                        {
+                            tmpBuffer.Add(V);
+                        }
+                    }
+                    else tmpBuffer.Add(y);
+                }
+                buffer = tmpBuffer;
+                tmpBuffer = new List<string>();
+            }
+
+            // Now re-run the buffer through the keep opts list
+            tmpBuffer = new List<string>();
+            foreach(string z in keepopts)
+            {
+                for(int i=0;i<buffer.Count;i++)
+                {
+                    string y = buffer[i];
+                    if (y.Contains(z))
+                    {
+                        string[] newbuff = y.Split(z);
+                        foreach(string V in newbuff)
+                        {
+                            tmpBuffer.Add(V);
+                            tmpBuffer.Add(z);
+                        }
+                    }else
+                    {
+                        tmpBuffer.Add(y);
+                    }
+                }
+                buffer = tmpBuffer;
+                tmpBuffer = new List<string>();
+            }
+
+
+
+            entries = buffer;
+            buffer = new List<string>();
+
+            return entries;
+        }
+    }
 }
