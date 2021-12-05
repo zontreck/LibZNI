@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using Newtonsoft.Json;
 
 [assembly: LibZNI.AutoUpdater("/job/LibZNI", "library.tar")]
 namespace LibZNI
@@ -28,6 +29,7 @@ namespace LibZNI
 
             return "unknown";
         }
+
 
         public static string Hash2String(byte[] Hash)
         {
@@ -65,16 +67,18 @@ namespace LibZNI
 
         public static string ZHX(string ToHash)
         {
-            ZHash.Instance.NewKey();
-            ZHash.Instance.Key = ToHash;
-            return ZHash.Instance.Key;
+            ZHash tmp = new ZHash();
+            tmp.NewKey();
+            tmp.CalculateKey(ToHash);
+            return tmp._key;
         }
 
         public static string ZSR(string ToSerialize)
         {
-            ZHash.Instance.NewSerial();
-            ZHash.Instance.Key = ToSerialize;
-            return ZHash.Instance.Key;
+            ZHash tmp = new ZHash();
+            tmp.NewSerial();
+            tmp.CalculateKey(ToSerialize);
+            return tmp._key;
         }
 
         public static string Base64Encode(string plainText)
@@ -104,47 +108,55 @@ namespace LibZNI
         }
     }
 
-
-
-    public sealed class ZHash
+    [Serializable()]
+    public class ZHash
     {
-        private static readonly object _lock = new object();
-        private static ZHash _inst = new ZHash();
-        static ZHash() { }
-
-        public static ZHash Instance
-        {
-            get
-            {
-                lock (_lock)
-                {
-                    if (_inst == null) _inst = new ZHash();
-                    return _inst;
-                }
-            }
-        }
-
-
+        [JsonRequired(), JsonProperty(PropertyName = "value")]
         public string _key;
-        public string Key
-        {
-            set
-            {
-                lock (_lock)
-                {
+        [JsonIgnore()]
+        public string _template;
 
-                    if (value != "")
-                        CalculateKey(value);
-                    else NewKey();
-                }
-            }
-            get
-            {
-                return _key;
-            }
+        public void Reset()
+        {
+            _key = _template;
+        }
+
+        public override string ToString()
+        {
+            return _key;
         }
 
 
+        public void NewKey()
+        {
+
+            _key = "".PadLeft(10, '0');
+            _key += "-";
+            _key += "".PadRight(4, '0');
+            _key += "-";
+            _key += "".PadRight(6, '0');
+            _key += "-";
+            _key += "".PadRight(8, '0');
+
+        }
+
+        public void NewSerial()
+        {
+            _key = "".PadLeft(10, '0');
+            _key += "-";
+            _key += "".PadRight(6, '0');
+            _key += "-";
+            _key += "".PadRight(4, '0');
+            _key += "-";
+            _key += "".PadRight(4, '0');
+            _key += "-";
+            _key += "".PadRight(2, '0');
+            _key += "-";
+            _key += "".PadRight(4, '0');
+            _key += "-";
+            _key += "".PadRight(8, '0');
+
+        }
         public void CalculateKey(string K)
         {
             string valid = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ=.+/\\][{}';:?><,_-)(*&^%$#@!`~|";
@@ -160,7 +172,7 @@ namespace LibZNI
                 if (V != '-')
                 {
                     MD5 MDHash = MD5.Create();
-                    for (int ii = 0; ii < K.Length; ii++)
+                    for (int ii = 0; ii < ((K.Length > _key.Length) ? _key.Length : K.Length); ii++)
                     {
                         byte[] md5Data = MDHash.ComputeHash(Encoding.UTF8.GetBytes((K + i.ToString() + valid[i].ToString() + valid[ii].ToString()).ToCharArray()));
                         // Replace digit with MD5'd  char from String K encoded alongside (i)
@@ -179,49 +191,61 @@ namespace LibZNI
             _key = tmp.ToString();
         }
 
-        public void NewKey()
+        public static byte[] HashToBytes(string Key)
         {
-            lock (_lock)
+            return Enumerable.Range(0, Key.Length).Where(x=>x % 2 == 0).Select(x=>Convert.ToByte(Key.Substring(x,2),16)).ToArray();
+        }
+        public static ZHash Bytes2Hash(byte[] key)
+        {
+            ZHash itm = new ZHash();
+            foreach(byte b in key)
             {
-
-                _key = "".PadLeft(10, '0');
-                _key += "-";
-                _key += "".PadRight(4, '0');
-                _key += "-";
-                _key += "".PadRight(6, '0');
-                _key += "-";
-                _key += "".PadRight(8, '0');
+                itm._key += b.ToString("X2");
             }
+            itm._template = itm._key;
+            return itm;
         }
 
-        public void NewSerial()
+        public static string Bytes2HashStr(byte[] key)
         {
-            lock (_lock)
-            {
-                _key = "".PadLeft(10, '0');
-                _key += "-";
-                _key += "".PadRight(6, '0');
-                _key += "-";
-                _key += "".PadRight(4, '0');
-                _key += "-";
-                _key += "".PadRight(4, '0');
-                _key += "-";
-                _key += "".PadRight(2, '0');
-                _key += "-";
-                _key += "".PadRight(4, '0');
-                _key += "-";
-                _key += "".PadRight(8, '0');
-            }
-        }
-
-        public void SetKey(string Key)
-        {
-            _key = Key;
+            return Bytes2Hash(key)._key;
         }
     }
 
+
     public static class ZNILSLTools
     {
+        public static bool Compare<T>(this List<string> itx, List<string> itx2)
+        {
+            if (itx.Count != itx2.Count) return false;
+            for(int i = 0; i < itx.Count; i++)
+            {
+                if(itx[i] != itx2[i]) return false;
+            }
+
+            return true;
+        }
+
+        public static List<string> llParseString2List(this string item, string[] opts, string[] keepopts)
+        {
+            return ParseString2List(item, opts, keepopts);
+        }
+        internal static string[] Augment(this string[] itm, string x)
+        {
+            List<string> working = new List<string>(itm);
+            List<string> buffer = new List<string>();
+            for(int i = 0; i < working.Count; i++)
+            {
+                if (String.IsNullOrEmpty(working[i])) break;
+                buffer.Add(working[i]);
+                
+                if (i == working.Count - 1) break;
+                else
+                    buffer.Add(x);
+
+            }
+            return buffer.ToArray();
+        }
         public static List<string> ParseString2List(this string item, string[] opts, string[] keepopts)
         {
             List<string> entries = new List<string>();
@@ -256,11 +280,10 @@ namespace LibZNI
                     string y = buffer[i];
                     if (y.Contains(z))
                     {
-                        string[] newbuff = y.Split(z);
+                        string[] newbuff = y.Split(z).Augment(z);
                         foreach(string V in newbuff)
                         {
                             tmpBuffer.Add(V);
-                            tmpBuffer.Add(z);
                         }
                     }else
                     {
