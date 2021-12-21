@@ -212,6 +212,21 @@ namespace LibZNI
         }
     }
 
+    public static class LinqExtensions
+    {
+        public static string ReplaceAtIndex(this string a, int b, string c)
+        {
+            string sSplice = "";
+            if(b == 0)
+            {
+                sSplice = $"{c}{a.Substring(1)}";
+            }else
+            {
+                sSplice = $"{a.Substring(0,b)}{c}{a.Substring(b+1)}";
+            }
+            return sSplice;
+        }
+    }
 
     public static class ZNILSLTools
     {
