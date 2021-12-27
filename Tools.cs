@@ -106,6 +106,55 @@ namespace LibZNI
             }
             return pathListStr;
         }
+
+        public static TimeSpan DecodeTimeNotation(string TimeStr)
+        {
+
+            List<string> P = TimeStr.ToLower().llParseString2List(new string[] { }, new string[] { "w", "d", "h", "m", "s" });
+            int i = 0;
+            //DateTime F = DateTime.Now;
+
+            TimeSpan F = new TimeSpan();
+            while (i < P.Count)
+            {
+                string ENTRY = P[i];
+                string TYPE = P[i + 1];
+                switch (TYPE)
+                {
+                    case "w":
+                        {
+
+                            F = F.Add(TimeSpan.FromDays(7*double.Parse(ENTRY)));
+                            break;
+                        }
+                    case "d":
+                        {
+                            F = F.Add(TimeSpan.FromDays(double.Parse(ENTRY)));
+                            break;
+                        }
+                    case "h":
+                        {
+                            F = F.Add(TimeSpan.FromHours(double.Parse(ENTRY)));
+                            break;
+                        }
+                    case "m":
+                        {
+                            F = F.Add(TimeSpan.FromMinutes(double.Parse(ENTRY)));
+                            break;
+                        }
+                    case "s":
+                        {
+
+                            F = F.Add(TimeSpan.FromSeconds(double.Parse(ENTRY)));
+                            break;
+                        }
+                }
+
+
+                i += 2;
+            }
+            return F;
+        }
     }
 
     [Serializable()]
