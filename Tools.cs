@@ -1,16 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 
-[assembly: LibZNI.AutoUpdater("/job/LibZNI", "library.tar")]
 namespace LibZNI
 {
     public class Tools
     {
+        /// <summary>
+        /// This function is meant for aiding in attacking the TripleDES encryption for the EDRA algorithm. We intentionally want to break TripleDES since we know for a fact we have one of the correct answers that was used as the encryption key. By doing this, we find the right encryption key with zero knowledge
+        /// </summary>
+        /// <param name="input">The TripleDES byte array we want to blank</param>
+        /// <returns>Zero filled Byte Array</returns>
+        public static byte[] MakeBlankKey(byte[] input)
+        {
+            return new byte[input.Length];
+        }
+
+        /// <summary>
+        /// This function is meant for aiding in attacking the TripleDES encryption for the EDRA algorithm. We intentionally want to break TripleDES since we know for a fact that we have one of the solutions. This function will increment the current key. If the attack has completed an exception will be thrown
+        /// </summary>
+        /// <param name="tdes">The key array</param>
+        /// <returns>The next key in sequence</returns>
+        public static byte[] IncrementAttackVector(byte[] tdes)
+        {
+            string hstr = Convert.ToHexString(tdes);
+            // Loop over the hex to check if every digit is an F
+            int Fi = 0;
+            for(int i = 0; i < hstr.Length; i++)
+            {
+                if (hstr[i] == 'F')
+                {
+                    Fi++;
+                }
+            }
+            if (Fi == hstr.Length) throw new ArgumentException("The operation is already completed");
+            BigInteger num = BigInteger.Parse(hstr, System.Globalization.NumberStyles.HexNumber);
+            num++;
+            hstr = Convert.ToHexString(num.ToByteArray());
+            return Convert.FromHexString(hstr);
+
+        }
 
         public static Int32 getTimestamp()
         {
@@ -63,6 +97,17 @@ namespace LibZNI
         {
             SHA256 Hasher = SHA256.Create();
             return Tools.Hash2String(Hasher.ComputeHash(ToHash));
+        }
+
+        public static byte[] SHA256HashBytes(byte[] ToHash)
+        {
+            SHA256 hasher = SHA256.Create();
+            return hasher.ComputeHash(ToHash);
+        }
+        public static byte[] SHA256HashBytes(string ToHash)
+        {
+            SHA256 hasher = SHA256.Create();
+            return hasher.ComputeHash(UTF8Encoding.UTF8.GetBytes(ToHash));
         }
 
         public static string ZHX(string ToHash)
@@ -275,6 +320,36 @@ namespace LibZNI
             }
             return sSplice;
         }
+        public static BigInteger GetAtIndex(this List<BigInteger> X, BigInteger I)
+        {
+            BigInteger D = -1;
+            foreach(BigInteger V in X)
+            {
+                D++;
+                if (D >= I) return V;
+            }
+            return 0;
+        }
+        public static int GoesIntoTimes(this BigInteger X, BigInteger Z)
+        {
+            int nTimes = 0;
+            if (X < Z) nTimes++;
+            BigInteger XC = X;
+            while(XC < Z)
+            {
+                nTimes++;
+                XC = XC + X;
+                if (XC >= Z)
+                {
+                    nTimes--;
+                    break;
+                }
+            }
+
+            return nTimes;
+        }
+
+        
     }
 
     public static class ZNILSLTools
@@ -294,6 +369,12 @@ namespace LibZNI
         {
             return ParseString2List(item, opts, keepopts);
         }
+
+        public static string llDumpList2String<T>(this List<T> items, string delimiter)
+        {
+            return String.Join(delimiter, items.Select(t => t.ToString()).ToArray());
+        }
+
         internal static string[] Augment(this string[] itm, string x)
         {
             List<string> working = new List<string>(itm);

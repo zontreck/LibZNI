@@ -4,10 +4,19 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>True</SignAssembly>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configurations>Debug;Release;DebPub;KVPBuild</Configurations>
+    <AssemblyOriginatorKeyFile>C:\Users\tyler\Downloads\ZNI.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="TEA.cs.ignore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="TEA.cs.ignore" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

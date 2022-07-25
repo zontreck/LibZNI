@@ -1,0 +1,163 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LibZNI
+{
+    public class XTEA
+    {
+        int[] xtea_key = new int[4];
+        int rounds = 6;
+        int DELTA;
+        int SECRET = 99999;
+
+        XTEA()
+        {
+            DELTA = int.Parse("0x9E3779B9", System.Globalization.NumberStyles.HexNumber);
+        }
+
+        public int hex2int(string hex)
+        {
+            if(hex.Substring(0,2) == "0x")
+            {
+                return int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+            }
+
+            if (hex.Substring(0, 1) == "x")
+            {
+                return int.Parse("0" + hex, System.Globalization.NumberStyles.HexNumber);
+            }
+
+            return int.Parse("0x" + hex, System.Globalization.NumberStyles.HexNumber);
+        }
+
+        void set_xtea_key(int[] key)
+        {
+            xtea_key = key;
+        }
+
+        public int[] make_key(string str)
+        {
+            MD5 sum = MD5.Create();
+            str = Convert.ToHexString(sum.ComputeHash(Encoding.UTF8.GetBytes(str)));
+            return new int[4] 
+            {
+                hex2int(str.Substring(0, 8)),
+                hex2int(str.Substring(8, 8)),
+                hex2int(str.Substring(16, 8)),
+                hex2int(str.Substring(24, 8))
+
+            };
+        }
+        static string ConvertToBase64Arithmetic(uint i)
+        {
+            string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            StringBuilder sb = new StringBuilder();
+
+            do
+            {
+                sb.Insert(0, alphabet[(int)(i % 64)]);
+                i = i / 64;
+            } while (i != 0);
+            return sb.ToString();
+        }
+
+        public string encipher(int v0, int v1)
+        {
+            int num = rounds;
+            int sum = 0;
+            do
+            {
+                v0 += (((v1 << 4) ^ ((v1 >> 5) & 0x07FFFFFF)) + v1) ^ (sum + xtea_key[sum & 3]);
+                sum += DELTA;
+
+                v1 += (((v0 << 4) ^ ((v0 >> 5) & 0x07FFFFFF)) + v0) ^ (sum + xtea_key[(sum >> 11) & 3]);
+
+                num--;
+            } while (num >0);
+
+            return ConvertToBase64Arithmetic((uint)v0).Substring(0, 6) + ConvertToBase64Arithmetic((uint)v1).Substring(0, 6);
+        }
+
+        public string decipher(int v0, int v1)
+        {
+            int num = rounds;
+            int sum = DELTA * num;
+
+            do
+            {
+                v1 -= (((v0 << 4) ^ ((v0 >> 5) & 0x07FFFFFF)) + v0) ^ (sum + xtea_key[(sum >> 11) & 3]);
+                sum -= DELTA;
+
+                v0 -= (((v1 << 4) ^ ((v1 >> 5) & 0x07FFFFFF)) + v1) ^ (sum + xtea_key[sum & 3]);
+
+                num--;
+            } while (num > 0);
+
+            return ConvertToBase64Arithmetic((uint)v0).Substring(0, 5) + ConvertToBase64Arithmetic((uint)v1).Substring(0, 5);
+        }
+
+        public string encrypt_string(string str)
+        {
+            str = Tools.Base64Encode(str);
+            int i = str.IndexOf('=');
+            if(i != -1)
+            {
+                str = str.Remove(i);
+            }
+
+            int len = str.Length;
+
+
+            str += "AAAAAAAAAA=";
+
+            string result="";
+            i = 0;
+
+            do
+            {
+                int i1 = int.Parse(Tools.Base64Decode(str.Substring(i, 5)+"A="));
+                int i2 = int.Parse(Tools.Base64Decode(str.Substring(i + 5, 5) + "A="));
+                result += encipher(i1, i2);
+                i += 10;
+            } while (i < len);
+
+
+            return result;
+        }
+        /*
+        public string decrypt_string(string str)
+        {
+            int len = str.Length;
+            int i = 0;
+            string result = "";
+
+            do
+            {
+                int v0;
+                int v1;
+
+                v0 = int.Parse(Tools.Base64Decode(str.Substring(i, 5) + "=="));
+                i += 6;
+                v1 = int.Parse(Tools.Base64Decode(str.Substring(i, 5) + "=="));
+                i += 6;
+                result += decipher(v0, v1);
+
+            } while (i < len);
+
+
+            i = result.Length - 1;
+            while(result.Substring(i-1,(i-(i-1))) == "AA")
+            {
+                result = result.Remove(i, ((i - i)==0? 1 : i));
+                i--;
+            }
+            i = result.Length - 1;
+
+            result = result.Substring()
+        }*/
+    }
+}
