@@ -5,12 +5,151 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml;
 using Newtonsoft.Json;
 
 namespace LibZNI
 {
     public class Tools
     {
+        /// <summary>
+        /// Finds whether the sum can even be calculated!
+        /// </summary>
+        /// <param name="targetSum">Target</param>
+        /// <param name="nums">List of numbers to use</param>
+        /// <returns>True if it is possible</returns>
+        public static bool canSum(int targetSum, List<int> nums, Dictionary<int, bool> memo)
+        {
+            if (memo == null) memo = new Dictionary<int, bool>();
+            if (memo.ContainsKey(targetSum)) return memo[targetSum];
+
+            if (targetSum == 0) return true;
+            if (targetSum < 0) return false;
+
+            foreach (int element in nums)
+            {
+                int remain = targetSum - element;
+                if (canSum(remain, nums, memo))
+                {
+                    memo[targetSum] = true;
+                    return true;
+                }
+            }
+
+            memo[targetSum] = false;
+            return false;
+        }
+
+        /// <summary>
+        /// Finds whether the sum can even be calculated!
+        /// </summary>
+        /// <param name="targetSum">Target</param>
+        /// <param name="nums">List of numbers to use</param>
+        /// <returns>True if it is possible</returns>
+        public static bool canSum(BigInteger targetSum, List<BigInteger> nums, Dictionary<BigInteger,bool> memo, int recurse=0)
+        {
+            if (memo == null) memo = new Dictionary<BigInteger, bool>();
+            if (memo.ContainsKey(targetSum)) return memo[targetSum];
+
+            if (recurse >= 20) throw new Exception("Fatal: Too nested");
+
+            if (targetSum == 0) return true;
+            if (targetSum < 0) return false;
+
+            foreach(BigInteger element in nums)
+            {
+                BigInteger remain = targetSum - element;
+                if (canSum(remain, nums, memo, recurse+1))
+                {
+                    memo[targetSum] = true;
+                    return true;
+                }
+            }
+
+            memo[targetSum] = false;
+            return false;
+        }
+        /// <summary>
+        /// Finds the shortest possible way to create the sum and returns that list
+        /// </summary>
+        /// <param name="elements">The list of items to create {sum} from</param>
+        /// <param name="sum">The magical number you want to recreate</param>
+        /// <param name="memo">A memory list to reduce the time taken finding the best way to make the sum!</param>
+        /// <returns>The list of {elements} recursively that can make the sum</returns>
+        public static List<int> BestSum(List<int> elements, int sum, Dictionary<int, List<int>> memo)
+        {
+            if (memo != null)
+            {
+                if (memo.ContainsKey(sum)) return memo[sum];
+            }
+            else memo = new Dictionary<int, List<int>>();
+
+            if (sum == 0) return new List<int>();
+            if (sum < 0) return null;
+            if (!canSum(sum, elements, null)) return null;
+
+
+            List<int> shortestCombo = null;
+
+            foreach (int element in elements)
+            {
+                int remainder = sum - element;
+
+                List<int> remCombo = BestSum(elements, remainder, memo);
+                if (remCombo != null)
+                {
+                    List<int> combo = new List<int>(remCombo);
+                    combo.Add(element);
+                    if (shortestCombo == null || combo.Count < shortestCombo.Count)
+                    {
+                        shortestCombo = combo;
+                    }
+                }
+                
+            }
+
+            memo[sum] = shortestCombo;
+            return shortestCombo;
+        }
+        /// <summary>
+        /// Finds the shortest possible way to create the sum and returns that list
+        /// </summary>
+        /// <param name="elements">The list of items to create {sum} from</param>
+        /// <param name="sum">The magical number you want to recreate</param>
+        /// <param name="memo">A memory list to reduce the time taken finding the best way to make the sum!</param>
+        /// <returns>The list of {elements} recursively that can make the sum</returns>
+        public static List<BigInteger> BestSum(List<BigInteger> elements, BigInteger sum, Dictionary<BigInteger, List<BigInteger>> memo, int recursion=0)
+        {
+            if (memo != null)
+            {
+                if (memo.ContainsKey(sum)) return memo[sum];
+            }
+            else memo = new Dictionary<BigInteger, List<BigInteger>>();
+            if (recursion >= 20) throw new Exception("Fatal: Too nested");
+            if (sum == 0) return new List<BigInteger>();
+            if (sum < 0) return null;
+            if (!canSum(sum, elements, null)) return null;
+
+            List<BigInteger> shortestCombo = null;
+
+            foreach (BigInteger element in elements)
+            {
+                BigInteger remainder = sum - element;
+                List<BigInteger> remCombo = BestSum(elements, remainder, memo, recursion+1);
+                if (remCombo != null)
+                {
+                    List<BigInteger> combo = new List<BigInteger>(remCombo);
+                    combo.Add(element);
+                    if (shortestCombo == null || combo.Count < shortestCombo.Count)
+                    {
+                        shortestCombo = combo;
+                    }
+                }
+            }
+
+            memo[sum] = shortestCombo;
+            return shortestCombo;
+        }
         /// <summary>
         /// This function is meant for aiding in attacking the TripleDES encryption for the EDRA algorithm. We intentionally want to break TripleDES since we know for a fact we have one of the correct answers that was used as the encryption key. By doing this, we find the right encryption key with zero knowledge
         /// </summary>
@@ -46,7 +185,9 @@ namespace LibZNI
 
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         public static Int32 getTimestamp()
+#pragma warning restore IDE1006 // Naming Styles
         {
             return int.Parse(DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString());
         }
@@ -152,6 +293,16 @@ namespace LibZNI
             return pathListStr;
         }
 
+        /// <summary>
+        /// Format: 
+        /// w = week
+        /// d = day
+        /// h = hour
+        /// m = minute
+        /// s = second
+        /// </summary>
+        /// <param name="TimeStr"></param>
+        /// <returns></returns>
         public static TimeSpan DecodeTimeNotation(string TimeStr)
         {
 
@@ -199,6 +350,69 @@ namespace LibZNI
                 i += 2;
             }
             return F;
+        }
+
+        public static int GetUnixDifference(TimeSpan ts)
+        {
+            return (int)ts.TotalSeconds;
+        }
+
+        /// <summary>
+        /// Encodes a timestamp or difference into ZNI Notation
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <returns>ZNI Time Notation</returns>
+        public static string EncodeTimeNotation(TimeSpan ts)
+        {
+            return EncodeTimeNotation(GetUnixDifference(ts));
+        }
+
+        /// <summary>
+        /// Encodes a unix timestamp or difference into ZNI Notation
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <returns>ZNI Time Notation</returns>
+        public static string EncodeTimeNotation(int ts)
+        {
+            var ONE_DAY = ((60 * 60) * 24);
+
+            var Days = ts / ONE_DAY;
+            ts -= (ONE_DAY * Days);
+            var Hours = ts / 60 / 60;
+            ts -= (Hours * 60 * 60);
+            var Minutes = ts / 60;
+            ts -= (Minutes * 60);
+
+            var Weeks = Days / 7;
+            Days -= Weeks * 7;
+
+            List<string> X = new List<string>();
+            if (Weeks > 0)
+            {
+                X.Add($"{Weeks}");
+                X.Add($"w");
+            }
+            if (Days > 0)
+            {
+                X.Add($"{Days}");
+                X.Add($"d");
+            }
+            if (Hours > 0)
+            {
+                X.Add($"{Hours}");
+                X.Add($"h");
+            }
+            if (Minutes > 0)
+            {
+                X.Add($"{Minutes}");
+                X.Add($"m");
+            }
+            if (ts > 0)
+            {
+                X.Add($"{ts}");
+                X.Add($"s");
+            }
+            return String.Join("", X);
         }
     }
 
@@ -308,6 +522,67 @@ namespace LibZNI
 
     public static class LinqExtensions
     {
+
+        /// <summary>
+        /// Ensures that the bit (bitToSet) is set on (i)
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="bitToSet"></param>
+        /// <returns>(i) with (bitToSet) set</returns>
+        public static void SetBit(this ref int i, int bitToSet)
+        {
+            if (!i.BitSet(bitToSet))
+            {
+                i += bitToSet;
+            }
+        }
+        public static bool BitSet(this ref int i, int bit)
+        {
+            return (i & bit) != 0;
+        }
+        /// <summary>
+        /// Ensures that the bit (bitToSet) is not set on (i)
+        /// </summary>
+        /// <param name="bitToSet"></param>
+        /// <returns>(i) with (bitToSet) not set</returns>
+        public static void UnsetBit(this ref int i, int bitToSet)
+        {
+            if (i.BitSet(bitToSet))
+            {
+                i -= bitToSet;
+            }
+        }
+
+        /// <summary>
+        /// Ensures that the bit (bitToSet) is set on (i)
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="bitToSet"></param>
+        /// <returns>(i) with (bitToSet) set</returns>
+        public static void SetBit(this ref byte i, byte bitToSet)
+        {
+            if (!i.BitSet(bitToSet))
+            {
+                i += bitToSet;
+            }
+        }
+        public static bool BitSet(this ref byte i, byte bit)
+        {
+            return (i & bit) != 0;
+        }
+        /// <summary>
+        /// Ensures that the bit (bitToSet) is not set on (i)
+        /// </summary>
+        /// <param name="bitToSet"></param>
+        /// <returns>(i) with (bitToSet) not set</returns>
+        public static void UnsetBit(this ref byte i, byte bitToSet)
+        {
+            if (i.BitSet(bitToSet))
+            {
+                i -= bitToSet;
+            }
+        }
+
         public static string ReplaceAtIndex(this string a, int b, string c)
         {
             string sSplice = "";
@@ -365,12 +640,20 @@ namespace LibZNI
             return true;
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         public static List<string> llParseString2List(this string item, string[] opts, string[] keepopts)
         {
-            return ParseString2List(item, opts, keepopts);
+            return ParseString2List(item, opts, keepopts, false);
         }
+        public static List<string> llParseStringKeepNulls(this string item, string[] opts, string[] keepopts)
+        {
+            return ParseString2List(item, opts, keepopts, true);
+        }
+#pragma warning restore IDE1006 // Naming Styles
 
+#pragma warning disable IDE1006 // Naming Styles
         public static string llDumpList2String<T>(this List<T> items, string delimiter)
+#pragma warning restore IDE1006 // Naming Styles
         {
             return String.Join(delimiter, items.Select(t => t.ToString()).ToArray());
         }
@@ -391,8 +674,97 @@ namespace LibZNI
             }
             return buffer.ToArray();
         }
-        public static List<string> ParseString2List(this string item, string[] opts, string[] keepopts)
+        /// <summary>
+        /// This function was partially taken from the OpenSimulator code and modified to no longer be LSL related and purely function the same way for my own sanity's sake
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="opts"></param>
+        /// <param name="keepopts"></param>
+        /// <returns></returns>
+        public static List<string> ParseString2List(this string item, string[] opts, string[] keepopts, bool keepNulls)
         {
+            int sourceLen = item.Length;
+            int optionsLength = opts.Length;
+            int spacersLen = keepopts.Length;
+
+            int dellen = 0;
+            string[] delArray = new string[optionsLength + spacersLen];
+
+            int outlen = 0;
+            string[] outArray = new string[sourceLen * 2 + 1];
+
+            int i, j;
+            string d;
+
+
+            for(i=0;i<optionsLength; i++)
+            {
+                d = opts[i].ToString();
+                if(d.Length > 0)
+                {
+                    delArray[dellen++] = d; 
+                }
+            }
+            optionsLength = dellen;
+
+
+            for (i = 0; i < spacersLen; i++)
+            {
+                d = keepopts[i].ToString();
+                if(d.Length > 0)
+                {
+                    delArray[dellen++] = d;
+                }
+            }
+
+
+            for(i=0; ;)
+            {
+                int earliestDel = -1;
+                int earliestSrc = sourceLen;
+                string earliestStr = null;
+
+                for(j = 0;j < dellen; j++)
+                {
+                    d = delArray[j];
+                    if(d != null)
+                    {
+                        int idx = item.IndexOf(d, i);
+                        if(idx < 0)
+                        {
+                            delArray[j] = null;
+                        }
+                        else if(idx < earliestSrc)
+                        {
+                            earliestSrc = idx;
+                            earliestDel = j;
+                            earliestStr = d;
+                            if (idx == i) break;
+                        }
+                    }
+                }
+
+                if(keepNulls || (earliestSrc > i))
+                {
+                    outArray[outlen++] = item.Substring(i, earliestSrc - i);
+                }
+                if (earliestDel < 0) break;
+                if(earliestDel >= optionsLength)
+                {
+                    outArray[outlen++] = earliestStr;
+                }
+                i = earliestSrc + earliestStr.Length;
+            }
+
+            List<string> outList = new List<string>();
+            for(i = 0;i<outlen; i++)
+            {
+                outList.Add(outArray[i]);
+            }
+
+            return outList;
+            /*
             List<string> entries = new List<string>();
             List<string> tmpBuffer = new List<string>();
             List<string> buffer = new List<string>();
@@ -444,7 +816,7 @@ namespace LibZNI
             entries = buffer;
             buffer = new List<string>();
 
-            return entries;
+            return entries;*/
         }
     }
 }

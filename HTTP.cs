@@ -12,7 +12,9 @@ namespace LibZNI
 {
     public class HTTP
     {
+#pragma warning disable IDE1006 // Naming Styles
         public static HTTPReplyData performRequest(string url, string sJson)
+#pragma warning restore IDE1006 // Naming Styles
         {
             HttpRequestMessage hrm = new HttpRequestMessage();
             hrm.Method = HttpMethod.Post;
@@ -20,7 +22,9 @@ namespace LibZNI
             hrm.Content = new StringContent(sJson, Encoding.UTF8, "application/json");
             return HTTP.Request(hrm);
         }
+#pragma warning disable IDE1006 // Naming Styles
         public static HTTPReplyData performRequest(string url, string sJson, string xSLOwner)
+#pragma warning restore IDE1006 // Naming Styles
         {
             HttpRequestMessage hrm = new HttpRequestMessage();
             hrm.Method = HttpMethod.Post;

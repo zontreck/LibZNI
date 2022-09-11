@@ -4,10 +4,8 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly>True</SignAssembly>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configurations>Debug;Release;DebPub;KVPBuild</Configurations>
-    <AssemblyOriginatorKeyFile>C:\Users\tyler\Downloads\ZNI.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.1.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Threading.Channels" Version="6.0.0" />
   </ItemGroup>

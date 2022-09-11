@@ -19,7 +19,9 @@ namespace LibZNI
             DELTA = int.Parse("0x9E3779B9", System.Globalization.NumberStyles.HexNumber);
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         public int hex2int(string hex)
+#pragma warning restore IDE1006 // Naming Styles
         {
             if(hex.Substring(0,2) == "0x")
             {
@@ -34,12 +36,16 @@ namespace LibZNI
             return int.Parse("0x" + hex, System.Globalization.NumberStyles.HexNumber);
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         void set_xtea_key(int[] key)
+#pragma warning restore IDE1006 // Naming Styles
         {
             xtea_key = key;
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         public int[] make_key(string str)
+#pragma warning restore IDE1006 // Naming Styles
         {
             MD5 sum = MD5.Create();
             str = Convert.ToHexString(sum.ComputeHash(Encoding.UTF8.GetBytes(str)));
@@ -65,7 +71,9 @@ namespace LibZNI
             return sb.ToString();
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         public string encipher(int v0, int v1)
+#pragma warning restore IDE1006 // Naming Styles
         {
             int num = rounds;
             int sum = 0;
@@ -82,7 +90,9 @@ namespace LibZNI
             return ConvertToBase64Arithmetic((uint)v0).Substring(0, 6) + ConvertToBase64Arithmetic((uint)v1).Substring(0, 6);
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         public string decipher(int v0, int v1)
+#pragma warning restore IDE1006 // Naming Styles
         {
             int num = rounds;
             int sum = DELTA * num;
@@ -100,7 +110,9 @@ namespace LibZNI
             return ConvertToBase64Arithmetic((uint)v0).Substring(0, 5) + ConvertToBase64Arithmetic((uint)v1).Substring(0, 5);
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         public string encrypt_string(string str)
+#pragma warning restore IDE1006 // Naming Styles
         {
             str = Tools.Base64Encode(str);
             int i = str.IndexOf('=');
