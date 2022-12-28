@@ -9,14 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TEA.cs.ignore" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="TEA.cs.ignore" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="2.1.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Threading.Channels" Version="6.0.0" />
