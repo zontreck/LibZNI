@@ -7,40 +7,39 @@ using System.Threading.Tasks;
 
 namespace LibZNI.Serialization.ZNIFile
 {
-    public class ByteArrayTag : Tag
+    public class uLongTag : Tag
     {
-        private byte[] BArrVal;
-        public byte[] Value
+        private ulong LongVal;
+        public ulong Value
         {
             get
             {
-                return BArrVal;
+                return LongVal;
             }
         }
         
-        public ByteArrayTag(string _Name, byte[] val)
+        public uLongTag(string _Name, ulong val)
         {
             Name = _Name;
-            BArrVal = val;
+            LongVal = val;
         }
-        public ByteArrayTag(byte[] boolVal) : this(null, boolVal)
+        public uLongTag(ulong _LongVal) : this(null, _LongVal)
         {
         }
-        public ByteArrayTag() : this(null, new byte[] {}) { }
+        public uLongTag() : this(null, 0) { }
 
         public override TagType Type
         {
             get
             {
-                return TagType.BYTEARRAY;
+                return TagType.ULONG;
             }
         }
 
         public override bool ReadTag(BinaryReader br)
         {
             Name = br.ReadString();
-            int count = br.ReadInt32();
-            BArrVal = br.ReadBytes(count);
+            LongVal = br.ReadUInt64();
             return true;
         }
 
@@ -51,7 +50,7 @@ namespace LibZNI.Serialization.ZNIFile
 
         public override void SkipTag(BinaryReader br)
         {
-            _ = new ByteArrayTag().ReadTag(br);
+            _ = new uLongTag().ReadTag(br);
         }
 
         public override void WriteData(BinaryWriter bw)
@@ -63,14 +62,13 @@ namespace LibZNI.Serialization.ZNIFile
         {
             bw.Write(((int)Type));
             bw.Write(Name);
-            bw.Write(Value.Length);
 
             bw.Write(Value);
         }
 
         public override object Clone()
         {
-            return new ByteArrayTag(Name, Value);
+            return new uLongTag(Name, Value);
         }
     }
 }

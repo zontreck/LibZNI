@@ -7,40 +7,39 @@ using System.Threading.Tasks;
 
 namespace LibZNI.Serialization.ZNIFile
 {
-    public class ByteArrayTag : Tag
+    public class UUIDTag : Tag
     {
-        private byte[] BArrVal;
-        public byte[] Value
+        private Guid LongVal;
+        public Guid Value
         {
             get
             {
-                return BArrVal;
+                return LongVal;
             }
         }
         
-        public ByteArrayTag(string _Name, byte[] val)
+        public UUIDTag(string _Name, Guid val)
         {
             Name = _Name;
-            BArrVal = val;
+            LongVal = val;
         }
-        public ByteArrayTag(byte[] boolVal) : this(null, boolVal)
+        public UUIDTag(Guid _LongVal) : this(null, _LongVal)
         {
         }
-        public ByteArrayTag() : this(null, new byte[] {}) { }
+        public UUIDTag() : this(null, Guid.Empty) { }
 
         public override TagType Type
         {
             get
             {
-                return TagType.BYTEARRAY;
+                return TagType.UUID;
             }
         }
 
         public override bool ReadTag(BinaryReader br)
         {
             Name = br.ReadString();
-            int count = br.ReadInt32();
-            BArrVal = br.ReadBytes(count);
+            LongVal = Guid.Parse(br.ReadString());
             return true;
         }
 
@@ -51,7 +50,7 @@ namespace LibZNI.Serialization.ZNIFile
 
         public override void SkipTag(BinaryReader br)
         {
-            _ = new ByteArrayTag().ReadTag(br);
+            _ = new UUIDTag().ReadTag(br);
         }
 
         public override void WriteData(BinaryWriter bw)
@@ -63,14 +62,13 @@ namespace LibZNI.Serialization.ZNIFile
         {
             bw.Write(((int)Type));
             bw.Write(Name);
-            bw.Write(Value.Length);
 
-            bw.Write(Value);
+            bw.Write(Value.ToString());
         }
 
         public override object Clone()
         {
-            return new ByteArrayTag(Name, Value);
+            return new UUIDTag(Name, Value);
         }
     }
 }

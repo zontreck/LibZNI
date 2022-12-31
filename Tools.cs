@@ -192,6 +192,7 @@ namespace LibZNI
             return int.Parse(DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString());
         }
 
+        public static string userProfileFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         public static string GetOSShortID()
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

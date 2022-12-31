@@ -182,6 +182,15 @@ namespace LibZNI.Serialization.ZNIFile
                     case TagType.STRING:
                         _next = new StringTag();
                         break;
+                    case TagType.BYTEARRAY:
+                        _next = new ByteArrayTag();
+                        break;
+                    case TagType.INTARRAY:
+                        _next = new IntArrayTag();
+                        break;
+                    case TagType.LONGARRAY:
+                        _next = new LongArrayTag();
+                        break;
                     case TagType.END:
                         return true;
                 }

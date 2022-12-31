@@ -224,6 +224,32 @@ namespace LibZNI.Serialization.ZNIFile
                 }
             }
         }
+        public ulong uLongValue
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case TagType.ULONG:
+                        return (this as uLongTag).Value;
+                    default:
+                        throw new Exception("Invalid type");
+                }
+            }
+        }
+        public Guid UUIDValue
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case TagType.UUID:
+                        return (this as UUIDTag).Value;
+                    default:
+                        throw new Exception("Invalid type");
+                }
+            }
+        }
 
         public abstract void Rename(string old, string newName);
 

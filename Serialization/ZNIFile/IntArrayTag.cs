@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace LibZNI.Serialization.ZNIFile
 {
-    public class ByteArrayTag : Tag
+    public class IntArrayTag : Tag
     {
-        private byte[] BArrVal;
-        public byte[] Value
+        private int[] BArrVal;
+        public int[] Value
         {
             get
             {
@@ -18,21 +18,21 @@ namespace LibZNI.Serialization.ZNIFile
             }
         }
         
-        public ByteArrayTag(string _Name, byte[] val)
+        public IntArrayTag(string _Name, int[] val)
         {
             Name = _Name;
             BArrVal = val;
         }
-        public ByteArrayTag(byte[] boolVal) : this(null, boolVal)
+        public IntArrayTag(int[] boolVal) : this(null, boolVal)
         {
         }
-        public ByteArrayTag() : this(null, new byte[] {}) { }
+        public IntArrayTag() : this(null, new int[] {}) { }
 
         public override TagType Type
         {
             get
             {
-                return TagType.BYTEARRAY;
+                return TagType.INTARRAY;
             }
         }
 
@@ -40,7 +40,12 @@ namespace LibZNI.Serialization.ZNIFile
         {
             Name = br.ReadString();
             int count = br.ReadInt32();
-            BArrVal = br.ReadBytes(count);
+            BArrVal = new int[count];
+            for(int i = 0; i < count; i++)
+            {
+                BArrVal[i] = br.ReadInt32();
+            }
+
             return true;
         }
 
@@ -51,7 +56,7 @@ namespace LibZNI.Serialization.ZNIFile
 
         public override void SkipTag(BinaryReader br)
         {
-            _ = new ByteArrayTag().ReadTag(br);
+            _ = new IntArrayTag().ReadTag(br);
         }
 
         public override void WriteData(BinaryWriter bw)
@@ -65,12 +70,15 @@ namespace LibZNI.Serialization.ZNIFile
             bw.Write(Name);
             bw.Write(Value.Length);
 
-            bw.Write(Value);
+            foreach(int i in Value)
+            {
+                bw.Write(i);
+            }
         }
 
         public override object Clone()
         {
-            return new ByteArrayTag(Name, Value);
+            return new IntArrayTag(Name, Value);
         }
     }
 }
