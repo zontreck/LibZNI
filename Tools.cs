@@ -10,6 +10,36 @@ using Newtonsoft.Json;
 
 namespace LibZNI
 {
+
+    public static class ConfigLocation
+    {
+        private static string LINUX_CONFIG_PATH = Tools.userProfileFolder;
+        private static string MAC_CONFIG_PATH = LINUX_CONFIG_PATH;
+        private static string WINDOWS_CONFIG_PATH = Tools.userProfileFolder;
+
+        public static string GetPath()
+        {
+            switch(Tools.GetOSShortID())
+            {
+                case "windows":
+                    {
+                        return Path.GetFullPath( WINDOWS_CONFIG_PATH );
+                    }
+                case "linux":
+                    {
+                        return Path.GetFullPath(LINUX_CONFIG_PATH);
+                    }
+                case "osx":
+                    {
+                        return Path.GetFullPath(MAC_CONFIG_PATH);
+                    }
+                default:
+                    {
+                        return Path.GetFullPath(LINUX_CONFIG_PATH);
+                    }
+            }
+        }
+    }
     public class Tools
     {
         /// <summary>

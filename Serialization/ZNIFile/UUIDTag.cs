@@ -17,6 +17,18 @@ namespace LibZNI.Serialization.ZNIFile
                 return LongVal;
             }
         }
+        public static UUIDTag Random(string sName)
+        {
+            UUIDTag rnd = new UUIDTag(sName, Guid.Random());
+
+            return rnd;
+        }
+
+        public static UUIDTag Empty(string sName)
+        {
+            UUIDTag z = new UUIDTag(sName, Guid.Empty());
+            return rnd;
+        }
         
         public UUIDTag(string _Name, Guid val)
         {
