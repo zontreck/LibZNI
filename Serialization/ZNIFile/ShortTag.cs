@@ -7,51 +7,39 @@ using System.Threading.Tasks;
 
 namespace LibZNI.Serialization.ZNIFile
 {
-    public class UUIDTag : Tag
+    public class ShortTag : Tag
     {
-        private Guid LongVal;
-        public Guid Value
+        private short FloatVal;
+        public short Value
         {
             get
             {
-                return LongVal;
+                return FloatVal;
             }
         }
-        public static UUIDTag Random(string sName)
-        {
-            UUIDTag rnd = new UUIDTag(sName, Guid.NewGuid());
-
-            return rnd;
-        }
-
-        public static UUIDTag Empty(string sName)
-        {
-            UUIDTag z = new UUIDTag(sName, Guid.Empty);
-            return z;
-        }
         
-        public UUIDTag(string _Name, Guid val)
+        public ShortTag(string _Name, short val)
         {
             Name = _Name;
-            LongVal = val;
+            FloatVal = val;
         }
-        public UUIDTag(Guid _LongVal) : this(null, _LongVal)
+        public ShortTag(short _FloatVal) : this(null, _FloatVal)
         {
         }
-        public UUIDTag() : this(null, Guid.Empty) { }
+        public ShortTag() : this(null, 0) { }
 
         public override TagType Type
         {
             get
             {
-                return TagType.UUID;
+                return TagType.SHORT;
             }
         }
 
         public override bool ReadTag(BinaryReader br)
         {
             Name = br.ReadString();
-            LongVal = Guid.Parse(br.ReadString());
+            FloatVal = br.ReadInt16();
             return true;
         }
 
@@ -62,7 +50,7 @@ namespace LibZNI.Serialization.ZNIFile
 
         public override void SkipTag(BinaryReader br)
         {
-            _ = new UUIDTag().ReadTag(br);
+            _ = new ShortTag().ReadTag(br);
         }
 
         public override void WriteData(BinaryWriter bw)
@@ -75,12 +63,12 @@ namespace LibZNI.Serialization.ZNIFile
             bw.Write(((int)Type));
             bw.Write(Name);
 
-            bw.Write(Value.ToString());
+            bw.Write(Value);
         }
 
         public override object Clone()
         {
-            return new UUIDTag(Name, Value);
+            return new ShortTag(Name, Value);
         }
     }
 }

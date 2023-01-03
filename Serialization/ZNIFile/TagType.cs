@@ -8,19 +8,20 @@ namespace LibZNI.Serialization.ZNIFile
 {
     public enum TagType
     {
-        FOLDER = 10,
-        STRING = 8,
-        INTEGER = 3,
-        LIST = 9, // List can be any valid Tag Type
         END = 0, // Present at the end of a folder or list
-        BOOL = 13,
-        DOUBLE = 6,
-        FLOAT = 5,
-        LONG = 4,
         BYTE = 1,
+        SHORT = 2,
+        INTEGER = 3,
+        LONG = 4,
+        FLOAT = 5,
+        DOUBLE = 6,
         BYTEARRAY = 7,
+        STRING = 8,
+        LIST = 9, // List can be any valid Tag Type
+        FOLDER = 10,
         INTARRAY = 11,
-        LONGARRAY=12,
+        LONGARRAY = 12,
+        BOOL = 13,
         ULONG=14,
         UUID=15,
 
