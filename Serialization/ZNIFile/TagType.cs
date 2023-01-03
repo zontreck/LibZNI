@@ -6,27 +6,28 @@ using System.Threading.Tasks;
 
 namespace LibZNI.Serialization.ZNIFile
 {
-    public enum TagType
+    // Aria: Changed to a type of byte which keeps it to only one byte when writing out in serializing
+    public enum TagType : byte
     {
-        END = 0, // Present at the end of a folder or list
-        BYTE = 1,
-        SHORT = 2,
-        INTEGER = 3,
-        LONG = 4,
-        FLOAT = 5,
-        DOUBLE = 6,
-        BYTEARRAY = 7,
-        STRING = 8,
-        LIST = 9, // List can be any valid Tag Type
-        FOLDER = 10,
-        INTARRAY = 11,
-        LONGARRAY = 12,
-        BOOL = 13,
-        ULONG=14,
-        UUID=15,
+        END = 0x00, // Present at the end of a folder
+        BYTE = 0x01,
+        SHORT = 0x02,
+        INTEGER = 0x03,
+        LONG = 0x04,
+        FLOAT = 0x05,
+        DOUBLE = 0x06,
+        BYTEARRAY = 0x07,
+        STRING = 0x08,
+        LIST = 0x09, // List can be any valid Tag Type
+        FOLDER = 0x0A,
+        INTARRAY = 0x0B,
+        LONGARRAY = 0x0C,
+        BOOL = 0x0D,
+        ULONG=0x0E,
+        UUID=0x0F,
 
 
 
-        INVALID=99
+        INVALID=0xFF
     }
 }

@@ -53,10 +53,12 @@ namespace LibZNI.Serialization.ZNIFile
             }
         }
 
-        public abstract bool ReadTag(BinaryReader br);
-        public abstract void SkipTag(BinaryReader br);
-        public abstract void WriteTag(BinaryWriter bw);
-        public abstract void WriteData(BinaryWriter bw);
+        public abstract bool ReadTag(NBTReader br);
+        public abstract void SkipTag(NBTReader br);
+        public abstract void WriteTag(NBTWriter bw);
+        public abstract void WriteData(NBTWriter bw);
+
+        public abstract void CastFrom(Folder F);
 
         private string Error = "Invalid tag type";
         public virtual Tag this[int index]

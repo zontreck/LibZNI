@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,8 +17,9 @@ namespace LibZNI.Serialization
     {
         public static void WriteOnStream(Stream s, Tag x)
         {
-            BinaryWriter bw = new BinaryWriter(s);
+            NBTWriter bw = new NBTWriter(s, true);
             x.WriteTag(bw);
+            x.WriteData(bw);
         }
 
         public static Folder ReadFromStream(Stream s)
@@ -26,8 +28,8 @@ namespace LibZNI.Serialization
             {
 
                 Folder folder = new Folder();
-                BinaryReader br = new BinaryReader(s);
-                TagType type = (TagType)br.ReadInt32();
+                NBTReader br = new NBTReader(s,true);
+                TagType type = (TagType)br.ReadByte();
                 if (type == TagType.FOLDER)
                 {
                     // Read the file!
@@ -41,15 +43,23 @@ namespace LibZNI.Serialization
             }
         }
 
-        public static void SaveToFile(string FileName, Tag x)
+        public static void SaveToFile(string FileName, Tag x, bool gz=false)
         {
-            FileStream fs = new FileStream(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            if(File.Exists(FileName))File.Delete(FileName);
+            Stream fs = new FileStream(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            if (gz){
+                fs = new GZipStream(fs, CompressionLevel.SmallestSize);
+            }
             WriteOnStream(fs, x);
             fs.Close();
         }
-        public static Folder ReadFromFile(string FileName)
+        public static Folder ReadFromFile(string FileName, bool gz = false)
         {
-            FileStream fs = new FileStream(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            Stream fs = new FileStream(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            if (gz)
+            {
+                fs = new GZipStream(fs, CompressionMode.Decompress);
+            }
             Folder f = ReadFromStream(fs);
             fs.Close();
             return f;

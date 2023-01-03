@@ -38,10 +38,10 @@ namespace LibZNI.Serialization.ZNIFile
         {
             return new DoubleTag(Name, Value);
         }
-
-        public override bool ReadTag(BinaryReader br)
+        public override bool ReadTag(NBTReader br)
         {
-            Name = br.ReadString();
+            if (!(Parent != null && Parent.Type == TagType.LIST))
+                Name = br.ReadString();
             DoubleVal = br.ReadDouble();
             return true;
         }
@@ -51,20 +51,27 @@ namespace LibZNI.Serialization.ZNIFile
             throw new NotImplementedException();
         }
 
-        public override void SkipTag(BinaryReader br)
+        public override void SkipTag(NBTReader br)
         {
             _ = new DoubleTag().ReadTag(br);
         }
 
-        public override void WriteData(BinaryWriter bw)
+        public override void WriteData(NBTWriter bw)
         {
-            throw new NotImplementedException();
+            if (!(Parent != null && Parent.Type == TagType.LIST))
+                bw.Write(Name);
+            bw.Write(Value);
         }
 
-        public override void WriteTag(BinaryWriter bw)
+        public override void WriteTag(NBTWriter bw)
         {
-            bw.Write(Name);
-            bw.Write(Value);
+            bw.Write(Type);
+
+        }
+
+        public override void CastFrom(Folder F)
+        {
+            throw new NotImplementedException();
         }
     }
 }

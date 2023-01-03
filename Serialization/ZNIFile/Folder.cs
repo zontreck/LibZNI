@@ -140,26 +140,21 @@ namespace LibZNI.Serialization.ZNIFile
         }
 
 
-        public override bool ReadTag(BinaryReader br)
+        public override bool ReadTag(NBTReader br)
         {
-            if(Parent != null)
-            {
-                SkipTag(br);
-                return false;
-            }
-            Name = br.ReadString(); // Per ZNIFile standards, each tag reads its own name!
+            // Aria: Removed a return on parent not being null because that is how the ZNI Parsing system works.
+            if (!(Parent != null && Parent.Type == TagType.LIST))
+                Name = br.ReadString();
 
-            while(true)
+
+            while (true)
             {
-                TagType next = (TagType)br.ReadInt32();
+                TagType next = br.ReadTagType();
                 Tag _next = null;
                 switch (next)
                 {
                     case TagType.FOLDER:
                         _next = new Folder();
-                        break;
-                    case TagType.BOOL:
-                        _next = new BoolTag();
                         break;
                     case TagType.BYTE:
                         _next = new ByteTag();
@@ -193,37 +188,80 @@ namespace LibZNI.Serialization.ZNIFile
                         break;
                     case TagType.END:
                         return true;
+
+                    case TagType.SHORT:
+                        _next = new ShortTag();
+                        break;
                 }
+                _next.Parent = this;
 
                 if (_next.ReadTag(br))
                 {
+                    if (_next.Type == TagType.FOLDER)
+                    {
+                        Folder NextTag = _next as Folder;
+                        if (NextTag.HasNamedTag("_virtcast_"))
+                        {
+                            ByteTag bt = NextTag["_virtcast_"] as ByteTag;
+                            next = (TagType)bt.Value;
+                            Tag temp = null;
+                            switch (next)
+                            {
+                                case TagType.BOOL:
+                                    temp = new BoolTag();
+                                    temp.CastFrom(NextTag);
+                                    break;
+                                case TagType.ULONG:
+                                    temp = new uLongTag();
+                                    temp.CastFrom(NextTag);
+                                    break;
+                                case TagType.UUID:
+                                    temp = new UUIDTag();
+                                    temp.CastFrom(NextTag);
+                                    break;
+                            }
+                            _next = temp;
+                        }
+
+                    }
                     Tags.Add(_next);
                 }
-                _next.Parent = this;
             }
+            return true;
+        }
+
+        public bool HasNamedTag(string Name)
+        {
+            foreach(Tag t in Tags)
+            {
+                if(t.Name == Name) return true;
+            }
+            return false;
         }
 
 
-        public override void SkipTag(BinaryReader br)
+        public override void SkipTag(NBTReader br)
         {
             _ = new Folder().ReadTag(br);
         }
 
-        public override void WriteData(BinaryWriter bw)
-        {
-            throw new NotImplementedException();
-        }
 
-        public override void WriteTag(BinaryWriter bw)
+        public override void WriteData(NBTWriter bw)
         {
-            bw.Write(((int)Type)); // Write int (0), folder
-            bw.Write(Name);
-
+            if (!(Parent != null && Parent.Type == TagType.LIST))
+                bw.Write(Name);
             foreach (Tag t in Tags)
             {
                 t.WriteTag(bw);
+                t.WriteData(bw);
             }
-            bw.Write(((int)TagType.END));
+            bw.Write(TagType.END);
+        }
+
+        public override void WriteTag(NBTWriter bw)
+        {
+            bw.Write(Type); // Write int (0), folder
+
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -245,6 +283,11 @@ namespace LibZNI.Serialization.ZNIFile
         {
             Name = existing.Name;
             Tags = new Collection<Tag>(Tags.ToArray());
+        }
+
+        public override void CastFrom(Folder F)
+        {
+            throw new NotImplementedException();
         }
     }
 }

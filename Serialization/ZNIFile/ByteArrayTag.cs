@@ -35,12 +35,12 @@ namespace LibZNI.Serialization.ZNIFile
                 return TagType.BYTEARRAY;
             }
         }
-
-        public override bool ReadTag(BinaryReader br)
+        public override bool ReadTag(NBTReader br)
         {
-            Name = br.ReadString();
-            int count = br.ReadInt32();
-            BArrVal = br.ReadBytes(count);
+            if(!(Parent!= null && Parent.Type == TagType.LIST))
+                Name = br.ReadString();
+            BArrVal = br.ReadBytes(br.ReadInt32());
+
             return true;
         }
 
@@ -49,28 +49,35 @@ namespace LibZNI.Serialization.ZNIFile
             throw new NotImplementedException();
         }
 
-        public override void SkipTag(BinaryReader br)
+        public override void SkipTag(NBTReader br)
         {
             _ = new ByteArrayTag().ReadTag(br);
         }
 
-        public override void WriteData(BinaryWriter bw)
+        public override void WriteData(NBTWriter bw)
         {
-            throw new NotImplementedException();
+
+            if (!(Parent != null && Parent.Type == TagType.LIST))
+                bw.Write(Name);
+            bw.Write(Value);
         }
 
-        public override void WriteTag(BinaryWriter bw)
+        public override void WriteTag(NBTWriter bw)
         {
-            bw.Write(((int)Type));
-            bw.Write(Name);
-            bw.Write(Value.Length);
+            bw.Write(Type);
 
-            bw.Write(Value);
+            
         }
 
         public override object Clone()
         {
             return new ByteArrayTag(Name, Value);
         }
+
+        public override void CastFrom(Folder F)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

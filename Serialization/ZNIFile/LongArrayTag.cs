@@ -36,10 +36,11 @@ namespace LibZNI.Serialization.ZNIFile
             }
         }
 
-        public override bool ReadTag(BinaryReader br)
+        public override bool ReadTag(NBTReader br)
         {
-            Name = br.ReadString();
-            int count = br.ReadInt32();
+            if (!(Parent != null && Parent.Type == TagType.LIST))
+                Name = br.ReadString();
+            int count = br.ReadVarInt();
             BArrVal = new long[count];
             for(int i = 0; i < count; i++)
             {
@@ -54,31 +55,36 @@ namespace LibZNI.Serialization.ZNIFile
             throw new NotImplementedException();
         }
 
-        public override void SkipTag(BinaryReader br)
+        public override void SkipTag(NBTReader br)
         {
             _ = new LongArrayTag().ReadTag(br);
         }
 
-        public override void WriteData(BinaryWriter bw)
+        public override void WriteData(NBTWriter bw)
         {
-            throw new NotImplementedException();
-        }
-
-        public override void WriteTag(BinaryWriter bw)
-        {
-            bw.Write(((int)Type));
-            bw.Write(Name);
+            if (!(Parent != null && Parent.Type == TagType.LIST))
+                bw.Write(Name);
             bw.Write(Value.Length);
 
-            foreach(int i in Value)
+            foreach (long i in Value)
             {
                 bw.Write(i);
             }
         }
 
+        public override void WriteTag(NBTWriter bw)
+        {
+            bw.Write(Type);
+        }
+
         public override object Clone()
         {
             return new LongArrayTag(Name, Value);
+        }
+
+        public override void CastFrom(Folder F)
+        {
+            throw new NotImplementedException();
         }
     }
 }

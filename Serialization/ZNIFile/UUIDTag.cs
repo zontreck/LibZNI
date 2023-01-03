@@ -48,11 +48,9 @@ namespace LibZNI.Serialization.ZNIFile
             }
         }
 
-        public override bool ReadTag(BinaryReader br)
+        public override bool ReadTag(NBTReader br)
         {
-            Name = br.ReadString();
-            LongVal = Guid.Parse(br.ReadString());
-            return true;
+            throw new Exception("Must be virtcasted!");
         }
 
         public override void Rename(string old, string newName)
@@ -60,27 +58,43 @@ namespace LibZNI.Serialization.ZNIFile
             throw new NotImplementedException();
         }
 
-        public override void SkipTag(BinaryReader br)
+        public override void SkipTag(NBTReader br)
         {
             _ = new UUIDTag().ReadTag(br);
         }
 
-        public override void WriteData(BinaryWriter bw)
+        public override void WriteData(NBTWriter bw)
         {
-            throw new NotImplementedException();
+            Folder vCast = new Folder(Name);
+            vCast.Add(new ByteTag("_virtcast_", (byte)Type));
+            vCast.Add(new ByteArrayTag("val", Value.ToByteArray()));
+            if (Parent != null)
+            {
+                if (Parent.Type == TagType.LIST)
+                {
+                    vCast.Add(new StringTag("name", Name));
+                }
+            }
+            vCast.WriteTag(bw);
+            vCast.WriteData(bw);
         }
 
-        public override void WriteTag(BinaryWriter bw)
+        public override void WriteTag(NBTWriter bw)
         {
-            bw.Write(((int)Type));
-            bw.Write(Name);
-
-            bw.Write(Value.ToString());
         }
 
         public override object Clone()
         {
             return new UUIDTag(Name, Value);
+        }
+
+        public override void CastFrom(Folder F)
+        {
+            if (!F.HasNamedTag("name"))
+                Name = F.Name;
+            else Name = F["name"].StringValue;
+            ByteArrayTag bat = F["val"] as ByteArrayTag;
+            LongVal = new Guid(bat.Value);
         }
     }
 }
