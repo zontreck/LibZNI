@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibZNI.Serialization
+namespace LibAC.Serialization
 {
     public static class SerializingHelper
     {

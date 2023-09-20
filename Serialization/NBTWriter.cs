@@ -1,13 +1,13 @@
 ﻿// DISCLAIMER: Taken from fNBT to be altered to fit the needs of ZNI NBT
 // All credit for the implementation of this file should go to the fNBT Authors, unless stated otherwise by comment!
 
-using LibZNI.Serialization.ZNIFile;
+using LibAC.Serialization.ACFile;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
-namespace LibZNI.Serialization
+namespace LibAC.Serialization
 {
     /// <summary> BinaryWriter wrapper that writes NBT primitives to a stream,
     /// while taking care of endianness and string encoding, and counting bytes written. </summary>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 
-namespace LibZNI
+namespace LibAC
 {
     [Serializable]
     public class BigFloat : IComparable, IComparable<BigFloat>, IEquatable<BigFloat>

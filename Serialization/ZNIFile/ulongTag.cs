@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibZNI.Serialization.ZNIFile
+namespace LibAC.Serialization.ACFile
 {
     public class uLongTag : Tag
     {

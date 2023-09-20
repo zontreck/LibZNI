@@ -1,5 +1,5 @@
-﻿using LibZNI.Serialization;
-using LibZNI.Serialization.ZNIFile;
+﻿using LibAC.Serialization;
+using LibAC.Serialization.ACFile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibZNI
+namespace LibAC
 {
     public class VersionNumberDifferentException : Exception
     {

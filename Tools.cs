@@ -9,7 +9,7 @@ using System.Text;
 using System.Xml;
 using Newtonsoft.Json;
 
-namespace LibZNI
+namespace LibAC
 {
 
     public static class ConfigLocation
@@ -287,6 +287,13 @@ namespace LibZNI
         {
             ZHash tmp = new ZHash();
             tmp.NewKey();
+            tmp.CalculateKey(ToHash);
+            return tmp._key;
+        }
+
+        public static string ZHS(string ToHash, int len)
+        {
+            ZHash tmp = ZHash.Bytes2Hash(new byte[len]);
             tmp.CalculateKey(ToHash);
             return tmp._key;
         }

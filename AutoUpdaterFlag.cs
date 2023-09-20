@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LibZNI
+namespace LibAC
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple =false, Inherited =true)]
     public class AutoUpdater : Attribute

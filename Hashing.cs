@@ -1,5 +1,5 @@
-﻿using LibZNI.Serialization;
-using LibZNI.Serialization.ZNIFile;
+﻿using LibAC.Serialization;
+using LibAC.Serialization.ACFile;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibZNI
+namespace LibAC
 {
     public class Hash : Serializable
     {

@@ -1,4 +1,4 @@
-﻿using LibZNI.Serialization.ZNIFile;
+﻿using LibAC.Serialization.ACFile;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibZNI.Serialization
+namespace LibAC.Serialization
 {
     /// <summary>
     /// This class contains helper functions for interacting with streams and files that are encoded using ZNIFile's structure

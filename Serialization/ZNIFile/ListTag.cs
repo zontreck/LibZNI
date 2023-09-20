@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace LibZNI.Serialization.ZNIFile
+namespace LibAC.Serialization.ACFile
 {
     public class ListTag : Tag, IList<Tag>, IList
     {

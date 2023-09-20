@@ -9,7 +9,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibZNI.Serialization.ZNIFile
+namespace LibAC.Serialization.ACFile
 {
     public class Folder : Tag, ICollection<Tag>, ICollection
     {

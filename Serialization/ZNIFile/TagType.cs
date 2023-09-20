@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibZNI.Serialization.ZNIFile
+namespace LibAC.Serialization.ACFile
 {
     // Aria: Changed to a type of byte which keeps it to only one byte when writing out in serializing
     public enum TagType : byte
