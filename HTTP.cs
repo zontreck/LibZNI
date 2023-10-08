@@ -17,7 +17,9 @@ namespace LibAC
 #pragma warning restore IDE1006 // Naming Styles
         {
             HttpRequestMessage hrm = new HttpRequestMessage();
-            hrm.Method = HttpMethod.Post;
+            if (sJson == "") hrm.Method = HttpMethod.Get;
+            else
+                hrm.Method = HttpMethod.Post;
             hrm.RequestUri = new Uri(url);
             hrm.Content = new StringContent(sJson, Encoding.UTF8, "application/json");
             return HTTP.Request(hrm);
@@ -27,7 +29,9 @@ namespace LibAC
 #pragma warning restore IDE1006 // Naming Styles
         {
             HttpRequestMessage hrm = new HttpRequestMessage();
-            hrm.Method = HttpMethod.Post;
+            if (sJson == "") hrm.Method = HttpMethod.Get;
+            else
+                hrm.Method = HttpMethod.Post;
             hrm.RequestUri = new Uri(url);
             hrm.Headers.Add("X-SecondLife-Owner-Key", xSLOwner);
             hrm.Content = new StringContent(sJson, Encoding.UTF8, "application/json");
